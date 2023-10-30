@@ -7,6 +7,7 @@ import {
   Post,
   HttpCode,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { Like, MoreThan, Repository } from 'typeorm';
 import { CreateEventDto } from './create-event.dto';
@@ -47,8 +48,10 @@ export class EventsController {
   }
 
   @Get(':id')
-  async findOne(@Param() id) {
-    return await this.repository.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.repository.findOneBy({
+      id: id,
+    });
   }
 
   @Post()
