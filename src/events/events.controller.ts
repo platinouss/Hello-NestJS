@@ -8,6 +8,7 @@ import {
   HttpCode,
   Patch,
   ParseIntPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { Like, MoreThan, Repository } from 'typeorm';
 import { CreateEventDto } from './create-event.dto';
@@ -15,6 +16,7 @@ import { UpdateEventDto } from './update-event.dto';
 import { Event } from './event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendee } from './Attendee';
+import { EventService } from './events.service';
 
 @Controller('/events')
 export class EventsController {
@@ -23,6 +25,7 @@ export class EventsController {
     private readonly repository: Repository<Event>,
     @InjectRepository(Attendee)
     private readonly attendRepository: Repository<Attendee>,
+    private readonly eventService: EventService,
   ) {}
 
   @Get()
@@ -71,9 +74,11 @@ export class EventsController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.repository.findOneBy({
-      id: id,
-    });
+    const event = await this.eventService.getEvent(id);
+    if (!event) {
+      throw new NotFoundException();
+    }
+    return event;
   }
 
   @Post()
