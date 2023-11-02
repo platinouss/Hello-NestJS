@@ -27,4 +27,18 @@ export class TrainingController {
     subject.teachers = [teacher1, teacher2];
     await this.subjectRepository.save(subject);
   }
+
+  @Post('/remove')
+  public async removingRelation() {
+    const subject = await this.subjectRepository.findOne({
+      where: {
+        id: 3,
+      },
+      relations: {
+        teachers: true,
+      },
+    });
+    subject.teachers = subject.teachers.filter((teacher) => teacher.id !== 7);
+    await this.subjectRepository.save(subject);
+  }
 }
